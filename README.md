@@ -32,7 +32,7 @@ The dataset contains **10,000 bank customers** and includes:
 - Personal information (age, gender, geography, credit score)
 - Banking details (account balance, number of products, tenure)
 - Activity metrics (credit card usage, active membership status)
-- Binary churn flag (`Exited` → renamed to `Churned`)
+- Binary churn flag (`Exited`)
 
 The dataset was moderately imbalanced:  
 - ~20% churned  
@@ -63,15 +63,23 @@ To rigorously evaluate each machine learning model, I analyzed:
 I visualized:
 
 ✅ **Pie Chart: Churn Distribution**  
+
+![Churn Distribution](images/Churn_Distribution.png)
 - Insight: Around 20% of customers churned. This confirmed a moderate class imbalance and justified the use of F1 score as the core metric.
 
-✅ **Bar Plot: Churn by Geography**  
+✅ **Bar Plot: Churn by Geography** 
+
+![Churn by Geography](images/Churn_by_Geography.png)
 - Insight: Germany had the highest churn rate, despite having fewer customers than France or Spain. This points to geography-specific churn dynamics.
 
 ✅ **Boxplot: Age vs Churn**  
+
+![Age vs Churn](images/Age_vs_Churn.png)
 - Insight: Older customers showed a higher likelihood of churning compared to younger customers.
 
 ✅ **Correlation Heatmap**  
+
+![Correlation Heatmap](images/Correlation_Heatmap.png)
 - Insight: Age and number of products showed small but meaningful correlations with churn. However, no single feature was strongly predictive, supporting the need for multivariate modeling.
 
 ---
@@ -140,6 +148,38 @@ Even after feature engineering, Random Forest maintained its top spot. However, 
 
 ---
 
+### ✂️ Feature Importance Insights & Experiment
+
+After running the Random Forest on the feature-engineered dataset, I visualized the **feature importances** to understand which variables contributed most to the model’s decisions.
+
+![Feature Importance](images/Feature_Importance.png)
+**Key insights:**
+- The top drivers of churn prediction included:
+  - Age
+  - Number of Products
+  - Product Usage
+  - Balance
+  - Age Groups (30–39, 40–49)
+  - Estimated Salary, Credit Score
+- Features like specific country interactions, tenure groups, or senior flags showed **lower individual importance**, but still contributed subtle predictive signals.
+
+---
+
+### 🧪 Experiment: Dropping Less Important Features
+
+To test whether simplifying the model would improve performance, I removed the **lower-ranked features** (those below `BalanceGroup_Medium` in the importance ranking) and retrained the Random Forest.
+
+**What happened?**
+- Both **F1 score and accuracy dropped** after the feature reduction.
+- This revealed an important lesson:
+  - Even features with **low individual importance** can add value when combined with others.
+  - They provide **backup signals, interactions, or subtle distinctions** that help the model generalize better.
+
+**Takeaway:**  
+It’s not always optimal to drop “unimportant” features blindly — sometimes, the full feature set yields the strongest predictive power.
+
+---
+
 ### 5️⃣ AutoML Validation with PyCaret
 
 To validate my manual pipeline, I used **PyCaret’s AutoML** framework.
@@ -158,71 +198,6 @@ PyCaret results differ slightly because:
 - It does not automatically carry over manual preprocessing (like class weights) unless explicitly configured.
 
 Despite these differences, PyCaret confirmed the same top models, increasing confidence in my manual analysis.
-
----
-
-## 📈 Recommended Graphs for README
-
-1. Churn Distribution Pie Chart → shows class imbalance  
-2. Churn by Geography Bar Chart → highlights region-specific risks  
-3. Age vs Churn Boxplot → visualizes age impact  
-4. Random Forest Feature Importance → reveals key churn drivers
-
-✅ Add these to your `/images` folder and embed like:
-
-
----
-
-### 2️⃣ Feature Engineering
-
-I created domain-driven features to enrich the dataset:
-- `BalanceZero` flag
-- `AgeGroup` bins
-- `BalanceToSalaryRatio`
-- `ProductUsage` interaction
-- `IsSenior`, `IsLoyalCustomer`
-- Groupings: salary, credit score, tenure, balance
-- Engagement scores and total account value
-
-This added meaningful **business context** that raw features missed.
-
----
-
-### 3️⃣ Machine Learning Models
-
-I trained and compared:
-- Random Forest
-- Logistic Regression
-- SVM (RBF kernel)
-- K-Nearest Neighbors (KNN)
-- Gradient Boosting (GBM)
-- LightGBM
-
-### Before Feature Engineering:
-- Best F1 Score → Random Forest (~0.63)
-
-### After Feature Engineering:
-- Best F1 Score → Still Random Forest, but with stronger stability and slightly improved recall.
-
-I also validated results using **PyCaret’s AutoML**, which confirmed the top models:
-- Gradient Boosting Classifier (GBM)
-- LightGBM
-- Random Forest
-
----
-
-### 4️⃣ Feature Importance
-
-Using Random Forest feature importance, I found:
-- Age
-- Number of products
-- Account balance
-- Tenure
-
-were the **top drivers of churn**.
-
-### Suggested Graph for README:
-✅ Feature importance bar chart (export as `feature_importance.png`)
 
 ---
 
@@ -250,8 +225,6 @@ were the **top drivers of churn**.
 - Incorporate **time-series trends** (e.g., recent activity drops) to improve predictions.
 - Deploy the final Random Forest or LightGBM model into a live production pipeline.
 - Track **business impact** over time: churn reduction, increased lifetime value, improved campaign ROI.
-
----
 
 ---
 

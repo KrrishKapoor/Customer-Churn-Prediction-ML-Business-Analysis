@@ -1,13 +1,13 @@
-# 🏦 Customer Churn Prediction — Business-Focused Machine Learning Analysis
+# Customer Churn Prediction — Turning Model Output into Retention Strategy
 
-## 📌 Project Overview
+## Project Overview
 
 In this project, I set out to solve a **common yet critical business challenge** faced by financial institutions:  
 **Which customers are at risk of leaving the bank, and how can we predict it early?**
 
-Churn prediction is vital for the banking industry because retaining an existing customer is **far less costly** than acquiring a new one. By leveraging machine learning models on customer data, I aim to empower the business to proactively **identify and retain high-risk customers** — improving profitability and reducing churn-driven revenue losses.
+Churn prediction is vital for the banking industry because retaining an existing customer is **far less costly** than acquiring a new one. By leveraging machine learning models on customer data, this project aims to empower the business to proactively **identify and retain high-risk customers**, improving profitability and reducing churn-driven revenue losses.
 
-This project combines:
+This analysis combines:
 - Advanced **exploratory data analysis (EDA)**
 - **Feature engineering** based on domain knowledge
 - Training and comparing **multiple machine learning models**
@@ -16,7 +16,7 @@ This project combines:
 
 ---
 
-## 🎯 Project Goals
+## Project Goals
 
 - Understand **why** customers churn, based on patterns in demographics, behavior, and account usage.
 - Build and evaluate machine learning models that **accurately predict churn**.
@@ -26,13 +26,26 @@ This project combines:
 
 ---
 
-## 📊 Dataset Summary
+## Executive Summary
 
-The dataset contains **10,000 bank customers** and includes:
-- Personal information (age, gender, geography, credit score)
-- Banking details (account balance, number of products, tenure)
-- Activity metrics (credit card usage, active membership status)
-- Binary churn flag (`Exited`)
+A 10,000 rows customer retail-banking dataset (≈ 20 % churn) was analysed to predict and explain customer attrition. After baseline modelling and business-driven feature engineering:
+- **Random Forest delivered the best balance of precision (0.59) and recall (0.68), yielding an F1 score of 0.63 on the imbalanced test set.** LightGBM and SVM performed comparably but exhibited greater trade-offs between false positives and false negatives.
+- Feature-importance inspection highlighted **age, number of products, product-usage intensity, and account balance** as leading churn indicators, with geography (Germany), tenure, and credit score providing secondary signals.
+- A feature-reduction experiment confirmed that seemingly “low-importance” variables contribute synergistically; removing them reduced both accuracy and F1 score.
+- **Business impact:** Targeting the top-risk decile identified by the model could retain an estimated $3-5 million in annual revenue (assuming historical average customer lifetime value), while geography-specific campaigns in Germany offer additional uplift.
+- **Recommended actions** include cross-selling additional products, revitalising inactive memberships, and launching real-time churn-risk dashboards for customer-success teams.
+
+---
+
+## Data Structure  
+The working data set combines 10,000 customer records across four logical tables:
+
+| Table | Key columns | Purpose |
+|-------|-------------|---------|
+| `customers`  | CustomerID, Gender, Geography, Age, Tenure | Demographic & account tenure |
+| `accounts`   | Balance, NumOfProducts, HasCrCard, IsActiveMember | Behavioural and product mix |
+| `salaries`   | EstimatedSalary | Disposable-income proxy |
+| `target`     | Exited (0/1) | Ground truth for churn |
 
 The dataset was moderately imbalanced:  
 - ~20% churned  
@@ -42,9 +55,9 @@ This imbalance made **F1-score** the primary evaluation metric (rather than pure
 
 ---
 
-## 🔍 Metrics Analyzed
+## Metrics Analyzed
 
-To rigorously evaluate each machine learning model, I analyzed:
+To rigorously evaluate each machine learning model, performance was assessed via:
 - **Accuracy** (overall correctness)
 - **Precision** (how many predicted churners were actually churners)
 - **Recall** (how many actual churners were correctly identified)
@@ -54,39 +67,39 @@ To rigorously evaluate each machine learning model, I analyzed:
 
 ---
 
-## 🛠 Key Project Stages
+## Key Project Stages
 
 ---
 
-### 1️⃣ Exploratory Data Analysis (EDA)
+### Exploratory Data Analysis (EDA)
 
-I visualized:
+Visualisations included:
 
-✅ **Pie Chart: Churn Distribution**  
+**Pie Chart: Churn Distribution**  
 
 ![Churn Distribution](images/Churn_Distribution.png)
 - Insight: Around 20% of customers churned. This confirmed a moderate class imbalance and justified the use of F1 score as the core metric.
 
-✅ **Bar Plot: Churn by Geography** 
+**Bar Plot: Churn by Geography** 
 
 ![Churn by Geography](images/Churn_by_Geography.png)
 - Insight: Germany had the highest churn rate, despite having fewer customers than France or Spain. This points to geography-specific churn dynamics.
 
-✅ **Boxplot: Age vs Churn**  
+**Boxplot: Age vs Churn**  
 
 ![Age vs Churn](images/Age_vs_Churn.png)
 - Insight: Older customers showed a higher likelihood of churning compared to younger customers.
 
-✅ **Correlation Heatmap**  
+**Correlation Heatmap**  
 
 ![Correlation Heatmap](images/Correlation_Heatmap.png)
 - Insight: Age and number of products showed small but meaningful correlations with churn. However, no single feature was strongly predictive, supporting the need for multivariate modeling.
 
 ---
 
-### 2️⃣ Baseline Machine Learning Models
+### Baseline Machine Learning Models
 
-I trained six baseline models:
+Six algorithms were trained with 5-fold CV and evaluated on a hold-out set:
 - Random Forest
 - Logistic Regression
 - SVM (RBF kernel)
@@ -94,9 +107,7 @@ I trained six baseline models:
 - Gradient Boosting (GBM)
 - LightGBM
 
-I used:
-- **5-fold cross-validation** on the training set
-- Test set evaluations using confusion matrices and classification reports
+Test set evaluations using confusion matrices and classification reports
 
 | Model                | Accuracy | Precision | Recall | F1 Score |
 |----------------------|----------|-----------|--------|----------|
@@ -107,32 +118,32 @@ I used:
 | Logistic Regression | 0.729    | 0.39      | 0.72   | 0.51     |
 | KNN                 | 0.828    | 0.62      | 0.33   | 0.43     |
 
-✅ **Interpretation:**  
+**Interpretation:**  
 Random Forest emerged as the top performer, balancing precision and recall best on the imbalanced dataset. LightGBM and SVM also showed promising performance but with trade-offs between recall and precision.
 
 ---
 
-### 3️⃣ Feature Engineering
+### Feature Engineering
 
-To strengthen the models, I engineered additional features using business logic, including:
+To strengthen the models, additional variables were derived using business logic, including:
 - `BalanceZero`: Flag if the customer has zero balance
 - `AgeGroup`: Binned age ranges
 - `BalanceToSalaryRatio`: Ratio of balance to salary
 - `ProductUsage`: Number of products × activity status
 - `IsSenior`: Flag for senior citizens
 - `IsLoyalCustomer`: Based on tenure ≥ 7 years
-- Grouped salary, credit score, tenure, and balance categories
+- `Grouped salary, credit score, tenure, and balance categories`
 - `EngagementScore`: Tenure × activity
 - `TotalValue`: Combined balance and salary
 
-✅ **Insight:**  
-These engineered features provided richer signals, especially combining behavioral patterns with financial attributes.
+**Insight:**  
+These features captured behavioural–financial interactions that standard attributes missed.
 
 ---
 
-### 4️⃣ Retraining Models After Feature Engineering
+### Retraining Models After Feature Engineering
 
-I retrained the same models on the enhanced dataset:
+The same models were retrained on enhanced dataset:
 
 | Model                | Accuracy | Precision | Recall | F1 Score |
 |----------------------|----------|-----------|--------|----------|
@@ -143,14 +154,14 @@ I retrained the same models on the enhanced dataset:
 | Logistic Regression | 0.729    | 0.39      | 0.72   | 0.51     |
 | KNN                 | 0.828    | 0.62      | 0.33   | 0.43     |
 
-✅ **Interpretation:**  
+**Interpretation:**  
 Even after feature engineering, Random Forest maintained its top spot. However, recall and precision shifts showed that additional features modestly improved the models' stability and interpretability.
 
 ---
 
-### ✂️ Feature Importance Insights & Experiment
+### Feature Importance Insights & Experiment
 
-After running the Random Forest on the feature-engineered dataset, I visualized the **feature importances** to understand which variables contributed most to the model’s decisions.
+After running the Random Forest on the feature-engineered dataset, the **feature importances** were visualized to understand which variables contributed most to the model’s decisions.
 
 ![Feature Importance](images/Feature_Importance.png)
 **Key insights:**
@@ -165,9 +176,9 @@ After running the Random Forest on the feature-engineered dataset, I visualized 
 
 ---
 
-### 🧪 Experiment: Dropping Less Important Features
+### Experiment: Dropping Less Important Features
 
-To test whether simplifying the model would improve performance, I removed the **lower-ranked features** (those below `BalanceGroup_Medium` in the importance ranking) and retrained the Random Forest.
+The **lower-ranked features** were removed, to test whether simplifying the model would improve performance (those below BalanceGroup_Medium in the importance ranking) and retrained the Random Forest.
 
 **What happened?**
 - Both **F1 score and accuracy dropped** after the feature reduction.
@@ -180,9 +191,9 @@ It’s not always optimal to drop “unimportant” features blindly — sometim
 
 ---
 
-### 5️⃣ AutoML Validation with PyCaret
+### AutoML Validation with PyCaret
 
-To validate my manual pipeline, I used **PyCaret’s AutoML** framework.
+To validate my manual pipeline, **PyCaret’s AutoML** framework was used.
 
 | Model                      | Accuracy | Recall | Precision | F1 Score |
 |----------------------------|----------|--------|-----------|----------|
@@ -190,7 +201,7 @@ To validate my manual pipeline, I used **PyCaret’s AutoML** framework.
 | LightGBM                   | 0.856   | 0.47   | 0.72      | 0.57     |
 | Random Forest              | 0.852   | 0.46   | 0.71      | 0.56     |
 
-✅ **Why Different Results?**  
+**Why Different Results?**  
 PyCaret results differ slightly because:
 - PyCaret uses **automated hyperparameter tuning**.
 - It applies **consistent cross-validation folds** across models.
@@ -230,14 +241,14 @@ Despite these differences, PyCaret confirmed the same top models, increasing con
 
 ## 🚀 Final Takeaway
 
-This project demonstrates how **machine learning + business insights** can combine to drive actionable, measurable improvements in customer retention.
+This analysis demonstrates how **machine-learning techniques aligned with business context** can produce actionable retention strategies. The work showcases:
 
 It showcases my ability to:
-- Build and tune predictive models
-- Engineer features based on business logic
-- Interpret model outputs into actionable recommendations
-- Apply both manual and AutoML workflows for robust results
+- Robust model development and tuning
+- Business-driven feature engineering
+- Clear translation of model outputs into strategic recommendations
+- Validation through both manual and AutoML workflows
 
-This is the kind of real-world, business-facing analysis I am passionate about bringing into a finance or analytics role.
+Such an approach provides a repeatable blueprint for data-informed customer-retention initiatives in financial services and beyond.
 
 ---

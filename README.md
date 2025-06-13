@@ -1,4 +1,4 @@
-# Customer Churn Prediction — Turning Model Output into Retention Strategy
+# Customer Churn Prediction: Turning Model Output into Retention Strategy
 
 ## Project Overview
 
@@ -187,7 +187,7 @@ The **lower-ranked features** were removed, to test whether simplifying the mode
   - They provide **backup signals, interactions, or subtle distinctions** that help the model generalize better.
 
 **Takeaway:**  
-It’s not always optimal to drop “unimportant” features blindly — sometimes, the full feature set yields the strongest predictive power.
+It’s not always optimal to drop “unimportant” features blindly. Sometimes, the full feature set yields the strongest predictive power.
 
 ---
 
@@ -212,7 +212,7 @@ Despite these differences, PyCaret confirmed the same top models, increasing con
 
 ---
 
-## 📈 Key Insights
+## Key Insights
 
 - **Older customers** are significantly more likely to churn.
 - **Customers with fewer products** or inactive memberships are at higher risk.
@@ -221,7 +221,7 @@ Despite these differences, PyCaret confirmed the same top models, increasing con
 
 ---
 
-## 💡 Business Recommendations
+## Business Recommendations
 
 - Launch targeted **retention campaigns** focused on older and high-balance customers.
 - Incentivize customers to **hold multiple products** (cross-sell strategies).
@@ -230,7 +230,7 @@ Despite these differences, PyCaret confirmed the same top models, increasing con
 
 ---
 
-## 🔮 Next Steps
+## Next Steps
 
 - Implement **threshold tuning** to optimize precision vs recall trade-off depending on business priorities.
 - Incorporate **time-series trends** (e.g., recent activity drops) to improve predictions.
@@ -239,7 +239,7 @@ Despite these differences, PyCaret confirmed the same top models, increasing con
 
 ---
 
-## 🚀 Final Takeaway
+## Final Takeaway
 
 This analysis demonstrates how **machine-learning techniques aligned with business context** can produce actionable retention strategies. The work showcases:
 
